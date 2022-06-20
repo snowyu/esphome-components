@@ -162,7 +162,7 @@ protected:
 private:
   uint16_t _raw_pixels[AMG88XX_PIXEL_ARRAY_SIZE];
   float _device_temperature{100};
-  uint32_t _last_time;
+  // uint32_t _last_time;
 
   uint16_t getPixelTemperatureRaw(unsigned char pixelAddr);
 

@@ -68,7 +68,7 @@ CONFIG_SCHEMA = (
         cv.Optional(CONF_POWER_MODE, default="NORMAL"): cv.enum(
             AMG88XX_POWER_MODE, upper=True
         ),
-        cv.Optional(CONF_FRAME_RATE, default="10FPS"): cv.enum(
+        cv.Optional(CONF_FRAME_RATE, default="1FPS"): cv.enum(
             AMG88XX_FRAME_RATE, upper=True
         ),
         cv.Optional(CONF_TRIGGER): cv.Schema(
@@ -88,13 +88,15 @@ CONFIG_SCHEMA = (
         cv.Optional(CONF_IR_CAMERA): text_sensor.text_sensor_schema(
         ),
     })
-    .extend(cv.polling_component_schema("100ms"))
+    .extend(cv.polling_component_schema("1s"))
     .extend(i2c.i2c_device_schema(0x69))
 )
 
 SETTERS = {
     # pin assignment
     CONF_ADDR_SELECT_PIN: "init_addr_select_pin",
+    CONF_POWER_MODE: "init_power_mode",
+    CONF_FRAME_RATE: "init_frame_rate",
 }
 
 # export to esphome

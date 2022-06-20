@@ -1,5 +1,7 @@
+// #include <math.h>
 #include <Arduino.h>
 #include <base64.h>
+
 
 #include "amg88xx.h"
 #include "esphome/core/log.h"
@@ -50,7 +52,7 @@ void AMG88XXComponent::setup() {
   reset(AMG88XX_INITIAL_RESET);
 
   if (int_pin_ != nullptr) {
-    if isinf(int_hysteresis_) int_hysteresis_ = int_high_ * AMG88XX_DEFAULT_HYSTERESIS_FACTOR;
+    if (isinf(int_hysteresis_)) int_hysteresis_ = int_high_ * AMG88XX_DEFAULT_HYSTERESIS_FACTOR;
     setInterruptLevels(int_high_, int_low_, int_hysteresis_);
   } else {
     // disable interrupts by default
@@ -59,8 +61,9 @@ void AMG88XXComponent::setup() {
 
   // set to 10 FPS
   setFrameRate(frame_rate_);
+
   delay(1000);
-  _last_time = millis();
+  // _last_time = millis();
 
   // if (readThermistor() <= 0) {
   //   this->mark_failed();
@@ -70,9 +73,7 @@ void AMG88XXComponent::setup() {
 void AMG88XXComponent::dump_config() {
   ESP_LOGCONFIG(TAG, "AMG88XX:");
   LOG_I2C_DEVICE(this);
-  if (this->is_failed()) {
-    ESP_LOGE(TAG, "Communication with AMG88XX failed!");
-  }
+
   ESP_LOGCONFIG(TAG, "  Power Mode: %s", LOG_STR_ARG(power_mode_to_str(power_mode_)));
   ESP_LOGCONFIG(TAG, "  Frame rate: %d FPS", this->frame_rate_  == AMG88XX_FPS_10 ? 10 : 1);
   if (this->int_pin_ != nullptr) {
@@ -85,7 +86,11 @@ void AMG88XXComponent::dump_config() {
     LOG_SENSOR("  ", "Device Temperature Sensor", this->temperature_sensor_);
   }
   if (this->ir_camera_sensor_) {
-    ESP_LOGCONFIG(TAG, "IR Camera Sensor: %s", this->ir_camera_sensor_->get_name().c_str());
+    ESP_LOGCONFIG(TAG, "IR Camera Sensor: \"%s\"", this->ir_camera_sensor_->get_name().c_str());
+  }
+
+  if (this->is_failed()) {
+    ESP_LOGE(TAG, "Communication with AMG88XX failed!");
   }
 
 }
@@ -106,9 +111,10 @@ void AMG88XXComponent::update_device_temperature() {
 }
 
 void AMG88XXComponent::update_ir_camera() {
-  uint32_t cur_time = millis();
-  if (this->ir_camera_sensor_ != nullptr && cur_time - _last_time >= 1000) {
-    _last_time = cur_time;
+  // uint32_t now = millis();
+  // if (this->ir_camera_sensor_ != nullptr && cur_time - _last_time >= 1000) {
+  if (this->ir_camera_sensor_ != nullptr) {
+    // _last_time = now;
     // uint8_t vSize = AMG88XX_PIXEL_ARRAY_SIZE << 1;
     // uint8_t vRaw_pixels[vSize];
     uint16_t vPixels[AMG88XX_PIXEL_ARRAY_SIZE];
@@ -141,6 +147,10 @@ void AMG88XXComponent::setFrameRate(FrameRate fps) {
   // set to 10 FPS
   v.FPS = fps;
   write8(AMG88XX_FPSC, v.get());
+
+  // set the interval of this PollingComponent.
+  uint32_t i = fps == AMG88XX_FPS_10 ?  (1 / 10) * 1000 : 1000;
+  set_update_interval(i);
 }
 
 void AMG88XXComponent::setPowerMode(PowerMode mode) {
