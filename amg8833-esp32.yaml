@@ -1,0 +1,50 @@
+substitutions:
+  # Name the device and it's entities
+  device: amg8833
+  device_name: amg8833_1
+
+esphome:
+  name: $device_name
+  platform: ESP32
+  board: esp32doit-devkit-v1
+
+external_components:
+  - source: components
+
+# ESP32 has 6 strapping pins:
+# • MTDI/GPIO12: internal pull-down
+# • GPIO0: internal pull-up
+# • GPIO2: internal pull-down
+# • GPIO4: internal pull-down
+# • MTDO/GPIO15: internal pull-up
+# • GPIO5: internal pull-up
+# i2c:
+#   sda: 21
+#   scl: 22
+#   scan: true
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  reboot_timeout: 20min
+
+  # Enable fallback hotspot in case wifi connection fails
+  ap:
+    ssid: "$device_name Fallback Hotspot"
+    password: !secret ap_password
+
+logger:
+
+api:
+
+ota:
+  password: !secret ota_password
+  reboot_timeout: 2min
+
+i2c:
+
+amg88xx:
+  ir_camera:
+    name: $device_name ir camera
+  device_temperature:
+    name: $device_name device temperature
