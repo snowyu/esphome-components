@@ -34,7 +34,7 @@
   * "STAND_BY_60s"
   * "STAND_BY_1m"
   * "SLEEP"
-* frame_rate(optional): defaults to 10 fps
+* frame_rate(optional): defaults to 1 fps
   * "10FPS" or "10 FPS"
   * "1FPS" or "1 FPS"
 * trigger_mode: only available when the `pin`(INT) is set
